@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import branch from "../../assets/branch.png";
 import games from "../../assets/games.png";
 
-export default function Navbar({ toggleSidebar }) {
-  const [searchQuery, setSearchQuery] = useState("");
+interface NavbarProps {
+  toggleSidebar: () => void;
+}
 
-  const handleSearch = (e) => {
+export default function Navbar({ toggleSidebar }: NavbarProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
   };
 
   return (

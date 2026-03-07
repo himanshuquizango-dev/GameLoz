@@ -161,6 +161,29 @@ app.get("/api/game/:appId", async (req, res) => {
   }
 });
 
+// Search games
+app.get("/api/games/search", async (req, res) => {
+  try {
+    const query = req.query.q || "";
+    if (!query) {
+      return res.json([]);
+    }
+
+    const result = await db.query(
+      `SELECT * FROM apps 
+       WHERE app_type = 'game' 
+       AND (name ILIKE $1 OR description ILIKE $1) 
+       ORDER BY ${TRENDING_ORDER} 
+       LIMIT 50`,
+      [`%${query}%`]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
