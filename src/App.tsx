@@ -10,6 +10,7 @@ import TermsOfUse from "./components/TermsOfUse";
 import ContactUs from "./components/ContactUs";
 import Category from "./components/Category";
 import OnlineGames from "./components/OnlineGames";
+import GameDetail from "./components/GameDetail";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -31,6 +32,7 @@ function App() {
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/gameCategory/:id" element={<Category />} />
           <Route path="/h5online" element={<OnlineGames />} />
+          <Route path="/app/:appId" element={<GameDetail />} />
         </Routes>
       </main>
       <Footer />

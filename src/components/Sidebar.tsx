@@ -1,17 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function Sidebar({ isOpen, toggleSidebar }) {
+interface SidebarProps {
+  isOpen: boolean;
+  toggleSidebar: () => void;
+}
+
+export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const categories = [
-    { name: "Action", route: "/gameCategory/1071" },
-    { name: "Racing", route: "/gameCategory/1072" },
-    { name: "Adventure", route: "/gameCategory/1073" },
-    { name: "Strategy", route: "/gameCategory/1074" },
-    { name: "Puzzle", route: "/gameCategory/1075" },
-    { name: "Casual", route: "/gameCategory/1076" },
-    { name: "Rpg", route: "/gameCategory/1077" },
-    { name: "Simulation", route: "/gameCategory/1078" },
-    { name: "Role Playing", route: "/gameCategory/1079" },
+    { name: "Action", route: "/gameCategory/Action" },
+    { name: "Adventure", route: "/gameCategory/Adventure" },
+    { name: "Arcade", route: "/gameCategory/Arcade" },
+    { name: "Board", route: "/gameCategory/Board" },
+    { name: "Card", route: "/gameCategory/Card" },
+    { name: "Casino", route: "/gameCategory/Casino" },
+    { name: "Casual", route: "/gameCategory/Casual" },
+    { name: "Educational", route: "/gameCategory/Educational" },
+    { name: "Music", route: "/gameCategory/Music" },
+    { name: "Puzzle", route: "/gameCategory/Puzzle" },
+    { name: "Racing", route: "/gameCategory/Racing" },
+    { name: "Role Playing", route: "/gameCategory/Role Playing" },
+    { name: "Simulation", route: "/gameCategory/Simulation" },
+    { name: "Sports", route: "/gameCategory/Sports" },
+    { name: "Strategy", route: "/gameCategory/Strategy" },
+    { name: "Trivia", route: "/gameCategory/Trivia" },
+    { name: "Word", route: "/gameCategory/Word" },
   ];
 
   return (
@@ -54,7 +67,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         </div>
 
         {/* Categories */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2" style={{  scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {categories.map((category, idx) => (
             <Link
               key={idx}

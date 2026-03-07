@@ -8,5 +8,5 @@ export const db = new Pool({
   port: Number(process.env.DB_PORT) || 5432,
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "root",
-  database: process.env.DB_NAME || "pocketapk",
+  database: process.env.DB_NAME || "gameloz",
 });

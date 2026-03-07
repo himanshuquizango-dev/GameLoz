@@ -43,7 +43,7 @@ async function fetchAndIngest(category: string, label: string) {
     const apps = await gplay.list({
       collection: (gplay.collection as any).TOP_FREE,
       category: category as any,
-      num: 100,
+      num: 5,
     });
 
     console.log(`    Found ${apps.length} apps`);
