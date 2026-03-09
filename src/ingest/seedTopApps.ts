@@ -43,7 +43,7 @@ async function fetchAndIngest(category: string, label: string) {
     const apps = await gplay.list({
       collection: (gplay.collection as any).TOP_FREE,
       category: category as any,
-      num: 5,
+      num: 100,
     });
 
     console.log(`    Found ${apps.length} apps`);
@@ -60,7 +60,7 @@ async function fetchAndIngest(category: string, label: string) {
           console.error(`    FAIL: ${app.appId} - ${err.message}`);
         }
       }
-      await delay(3000); // 3 seconds between each app
+      await delay(300); // 3 seconds between each app
     }
   } catch (err: any) {
     console.error(`  Could not fetch ${category}: ${err.message}`);

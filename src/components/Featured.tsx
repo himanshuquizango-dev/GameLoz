@@ -93,10 +93,10 @@ export default function Featured() {
   return (
     <section className="bg-white py-12">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 w-full flex-grow">
-        {renderSection("🔥 Trending Games", data.trendingGames)}
-        {renderSection("📱 Trending Apps", data.trendingApps)}
-        {renderSection("⭐ Editor's Choice Games", data.editorsChoiceGames)}
-        {renderSection("💎 Editor's Choice Apps", data.editorsChoiceApps)}
+        {renderSection("Featued Games", data.trendingGames)}
+        {renderSection("Latest Games", data.trendingApps)}
+        {renderSection("Latest Games", data.editorsChoiceGames)}
+        {renderSection("Hot Games", data.editorsChoiceApps)}
       </div>
     </section>
   );

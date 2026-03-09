@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import branch from "../../assets/branch.png";
 import games from "../../assets/games.png";
 
@@ -73,7 +75,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
                 type="submit"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
               >
-                🔍
+                <FontAwesomeIcon icon={faSearch} />
               </button>
             </div>
           </form>
