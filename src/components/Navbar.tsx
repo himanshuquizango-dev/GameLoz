@@ -82,7 +82,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
         </div>
 
         {/* Right Section */}
-        <div className="hidden md:flex ">
+        {/* <div className="hidden md:flex ">
           <Link to="/h5online" className="flex items-center gap-2 px-5 py-2 bg-accent text-black font-bold rounded-full hover:bg-yellow-500 transition">
             <img
               src={games}
@@ -91,7 +91,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
             />
             <span>Online Games</span>
           </Link>
-        </div>
+        </div> */}
 
       </div>
     </nav>

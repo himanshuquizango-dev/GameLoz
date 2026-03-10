@@ -20,15 +20,8 @@ const TRENDING_ORDER = `
 app.get("/api/games", async (req, res) => {
   try {
     const query = `
-      SELECT 
-        a.*, 
-        (
-          SELECT COALESCE(json_agg(s.file_name), '[]')
-          FROM screenshots s
-          WHERE s.app_id = a.app_id
-        ) as screenshots
-      FROM apps a
-      ORDER BY a.installs DESC
+      SELECT * FROM apps
+      ORDER BY installs DESC
       LIMIT 50
     `;
     const result = await db.query(query);
@@ -146,12 +139,8 @@ app.get("/api/game/:appId", async (req, res) => {
 
     const game = gameResult.rows[0];
 
-    // Get screenshots
-    const screenshotResult = await db.query(
-      `SELECT file_name FROM screenshots WHERE app_id = $1 ORDER BY file_name`,
-      [appId]
-    );
-    game.screenshots = screenshotResult.rows.map(r => r.file_name);
+    // Screenshots are now stored as URL array in the apps table
+    game.screenshots = game.screenshot_urls || [];
 
     // Get related games (same category, excluding current)
     const relatedResult = await db.query(

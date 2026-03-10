@@ -7,6 +7,7 @@ interface Game {
   rating: string;
   category: string;
   icon_file: string;
+  icon_url: string;
 }
 
 export default function SearchResults() {
@@ -52,6 +53,9 @@ export default function SearchResults() {
   return (
     <div className="flex-grow bg-white w-full">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[300px]">
+
+        </div>
         <h1 className="text-2xl font-bold mb-6 text-black">
           {query ? `Search results for "${query}"` : "Search Results"}
         </h1>
@@ -61,8 +65,8 @@ export default function SearchResults() {
             {games.map((game, idx) => (
               <Link to={`/app/${game.app_id}`} key={idx} className="flex flex-col cursor-pointer group">
                 <div className="aspect-square rounded-2xl bg-gray-100 flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform duration-200 overflow-hidden">
-                  <img 
-                    src={`/apps/${game.app_id}/${game.icon_file}`} 
+                  <img
+                    src={game.icon_url || `/apps/${game.app_id}/${game.icon_file}`}
                     alt={game.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

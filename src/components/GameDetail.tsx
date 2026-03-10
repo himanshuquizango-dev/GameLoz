@@ -22,11 +22,13 @@ interface GameData {
   updated: string;
   description: string;
   icon_file: string;
+  icon_url: string;
   content_rating: string;
   developer_email: string;
   privacy_policy: string;
   howtoplay?: string;
   screenshots: string[];
+  screenshot_urls: string[];
 }
 
 interface RelatedGame {
@@ -34,6 +36,7 @@ interface RelatedGame {
   name: string;
   rating: string;
   icon_file: string;
+  icon_url: string;
   category: string;
 }
 
@@ -60,7 +63,7 @@ export default function GameDetail() {
           const data = await res.json();
           setGame(data.game);
           setRelatedGames(data.relatedGames || []);
-          
+
           // Fetch App Store link
           try {
             const asRes = await fetch(`/api/appstore-search?term=${encodeURIComponent(data.game.name)}&dev=${encodeURIComponent(data.game.developer || "")}`);
@@ -129,7 +132,7 @@ export default function GameDetail() {
         <div className="flex items-start gap-6 mb-8">
           <div className="w-[120px] h-[120px] rounded-3xl overflow-hidden flex-shrink-0 shadow-md">
             <img
-              src={`/apps/${game.app_id}/${game.icon_file}`}
+              src={game.icon_url || `/apps/${game.app_id}/${game.icon_file}`}
               alt={game.name}
               className="w-full h-full object-cover"
             />
@@ -180,9 +183,9 @@ export default function GameDetail() {
           )}
         </div>
 
-          <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
 
-          </div>
+        </div>
         {/* Platform Badge */}
         <p className="text-[#a3a3a3] text-xs mb-2">Advertisement</p>
         <div className="mb-6">
@@ -221,7 +224,7 @@ export default function GameDetail() {
         <div className="mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Get The Games</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a 
+            <a
               href={appStoreLink}
               target="_blank"
               rel="noopener noreferrer"
@@ -234,7 +237,7 @@ export default function GameDetail() {
                 "com.tencent.ig": "com.pubg.imobile", // PUBG -> BGMI
               };
               const playStoreId = regionalAppIdMap[game.app_id] || game.app_id;
-              
+
               return (
                 <a
                   href={`https://play.google.com/store/apps/details?id=${playStoreId}`}
@@ -257,12 +260,12 @@ export default function GameDetail() {
           </div>
           <p className="text-[12px] text-gray-400 mt-1">All link sources on this site are jumped to App Store, Google Play and other official platforms. No virus, no malware.</p>
         </div>
-          <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
 
-          </div>
+        </div>
         {/* Screenshots Carousel */}
         {game.screenshots && game.screenshots.length > 0 && (
-          
+
           <div className="mb-8">
             <p className="text-[#a3a3a3] text-xs mb-2">Advertisement</p>
             <div className="relative">
@@ -277,7 +280,7 @@ export default function GameDetail() {
                     className="flex-shrink-0 h-[240px] sm:h-[320px] rounded-xl overflow-hidden snap-start shadow-md bg-gray-100"
                   >
                     <img
-                      src={`/apps/${game.app_id}/${ss}`}
+                      src={ss.startsWith('http') ? ss : `/apps/${game.app_id}/${ss}`}
                       alt={`${game.name} screenshot ${idx + 1}`}
                       className="h-full w-auto object-cover block"
                     />
@@ -325,22 +328,22 @@ export default function GameDetail() {
             )}
           </div>
         )}
-          <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
 
-          </div>
+        </div>
         {/* You May Also Like */}
         {relatedGames.length > 0 && (
           <div className="mb-8">
             <p className="text-[#a3a3a3] text-xs mb-2">Advertisement</p>
-                    <div className="border-b-[2px] border-black pb-2 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">You may also like</h2>
-        </div>
+            <div className="border-b-[2px] border-black pb-2 mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">You may also like</h2>
+            </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
               {relatedGames.map((rg, idx) => (
                 <Link to={`/app/${rg.app_id}`} key={idx} className="group cursor-pointer">
                   <div className="aspect-square rounded-2xl bg-gray-100 overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-200 mb-2">
                     <img
-                      src={`/apps/${rg.app_id}/${rg.icon_file}`}
+                      src={rg.icon_url || `/apps/${rg.app_id}/${rg.icon_file}`}
                       alt={rg.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {

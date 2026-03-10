@@ -7,6 +7,7 @@ interface Game {
   rating: number;
   category: string;
   icon_file: string;
+  icon_url: string;
   app_type: string;
 }
 
@@ -58,13 +59,13 @@ export default function Featured() {
   const renderGameCard = (game: Game, idx: number) => (
     <Link to={`/app/${game.app_id}`} key={`${game.app_id}-${idx}`} className="flex flex-col cursor-pointer group">
       <div className="aspect-square rounded-2xl bg-gray-100 flex items-center justify-center mb-2 shadow hover:shadow-md group-hover:scale-105 transition-all duration-200 overflow-hidden">
-        <img 
-          src={`/apps/${game.app_id}/${game.icon_file}`} 
-          alt={game.name} 
+        <img
+          src={game.icon_url || `/apps/${game.app_id}/${game.icon_file}`}
+          alt={game.name}
           className="w-full h-full object-cover"
           onError={(e) => {
-             (e.target as HTMLImageElement).style.display = 'none';
-             (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="text-4xl">🎮</div>`;
+            (e.target as HTMLImageElement).style.display = 'none';
+            (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="text-4xl">🎮</div>`;
           }}
         />
       </div>
@@ -92,16 +93,16 @@ export default function Featured() {
 
   return (
     <section className="bg-white py-12">
-      
-      <div className="max-w-[1400px] mx-auto px-4 lg:px-8 w-full flex-grow">
-        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
 
-          </div>
+      <div className="max-w-[1400px] mx-auto px-4 lg:px-8 w-full flex-grow">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[350px]">
+
+        </div>
         {renderSection("Featued Games", data.trendingGames)}
         {renderSection("Latest Games", data.trendingApps)}
-                  <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[350px]">
 
-          </div>  
+        </div>
         {renderSection("Latest Games", data.editorsChoiceGames)}
         {renderSection("Hot Games", data.editorsChoiceApps)}
       </div>

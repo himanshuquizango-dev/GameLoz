@@ -7,6 +7,7 @@ interface Game {
   rating: string;
   category: string;
   icon_file: string;
+  icon_url: string;
 }
 
 export default function Category() {
@@ -80,7 +81,7 @@ export default function Category() {
   return (
     <div className="flex-grow bg-white w-full">
       <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-10">
-        
+
         {/* Main Content */}
         <div className="flex-1">
           {/* Ad Placeholder */}
@@ -99,8 +100,8 @@ export default function Category() {
                 {games.map((game, idx) => (
                   <Link to={`/app/${game.app_id}`} key={idx} className="flex flex-col cursor-pointer group">
                     <div className="aspect-square rounded-2xl bg-gray-100 flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform duration-200 overflow-hidden">
-                      <img 
-                        src={`/apps/${game.app_id}/${game.icon_file}`} 
+                      <img
+                        src={game.icon_url || `/apps/${game.app_id}/${game.icon_file}`}
                         alt={game.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -116,11 +117,11 @@ export default function Category() {
                   </Link>
                 ))}
               </div>
-              
+
               {/* Load More Button */}
               {hasMore && (
                 <div className="flex justify-center mb-12">
-                  <button 
+                  <button
                     onClick={loadMore}
                     disabled={loadingMore}
                     className="bg-[#f27435] text-white px-12 py-3 rounded-full font-bold shadow-md hover:bg-[#d9662e] transition disabled:opacity-50 min-w-[200px]"
@@ -144,7 +145,7 @@ export default function Category() {
         <div className="w-full lg:w-72 flex-shrink-0 mt-10 lg:mt-0">
           <div className="flex items-center gap-2 mb-6 border-b border-gray-200 pb-2">
             <h2 className="text-lg font-bold text-black">Hot</h2>
-            <span className="text-blue-600 text-lg">◎</span> 
+            <span className="text-blue-600 text-lg">◎</span>
             <h2 className="text-lg font-bold text-blue-600">Games</h2>
           </div>
 
@@ -152,8 +153,8 @@ export default function Category() {
             {hotGames.map((game, idx) => (
               <Link to={`/app/${game.app_id}`} key={idx} className="flex items-center gap-4 cursor-pointer group">
                 <div className="w-[70px] h-[70px] rounded-[18px] bg-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-200 overflow-hidden">
-                  <img 
-                    src={`/apps/${game.app_id}/${game.icon_file}`} 
+                  <img
+                    src={game.icon_url || `/apps/${game.app_id}/${game.icon_file}`}
                     alt={game.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -172,7 +173,7 @@ export default function Category() {
               </Link>
             ))}
           </div>
-          
+
           <div className="mt-8 flex justify-center">
             <button className="flex items-center justify-center gap-2 border border-gray-200 text-blue-500 px-6 py-2 rounded-full font-medium hover:bg-gray-50 transition w-full">
               <span className="text-xl">+</span> Games

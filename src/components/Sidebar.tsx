@@ -36,7 +36,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30"
+          className="fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
           onClick={toggleSidebar}
         />
       )}
@@ -99,7 +99,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         </div>
 
         {/* Bottom Button */}
-        <div className="p-4 border-t border-gray-700">
+        {/* <div className="p-4 border-t border-gray-700">
           <Link
             to="/h5online"
             onClick={toggleSidebar}
@@ -112,7 +112,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
             />
              Online Games
           </Link>
-        </div>
+        </div> */}
       </aside>
     </>
   );

@@ -1,8 +1,6 @@
 import gplay from "google-play-scraper";
-import path from "path";
 import slugify from "slugify";
 import { db } from "../lib/db.js";
-import { downloadImage } from "./downloadImage.js";
 
 const GAME_CATEGORIES = [
   "GAME",
@@ -39,31 +37,20 @@ export async function ingestApp(appId: string) {
   const app = await gplay.app({ appId });
 
   const slug = slugify(app.title, { lower: true, strict: true });
-  const appDir = path.join("public/apps", appId);
 
-  // 3. Download icon
-  await downloadImage(app.icon, path.join(appDir, "icon.png"));
-
-  // 4. Download screenshots
-  for (let i = 0; i < app.screenshots.length; i++) {
-    await downloadImage(
-      app.screenshots[i],
-      path.join(appDir, `s${i + 1}.jpg`)
-    );
-  }
-
-  // 5. Determine app type
+  // 3. Determine app type
   const appType = GAME_CATEGORIES.includes(app.genreId) ? "game" : "app";
 
-  // 6. Insert app
+  // 4. Insert app with URLs stored directly in DB (no file downloads needed)
   await db.query(
     `INSERT INTO apps (
       app_id, name, developer, category,
       platforms, price, rating, installs,
       size, updated, description, icon_file, slug,
-      content_rating, developer_email, privacy_policy, app_type
+      content_rating, developer_email, privacy_policy, app_type,
+      icon_url, screenshot_urls
     )
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
     [
       appId,
       app.title,
@@ -82,17 +69,10 @@ export async function ingestApp(appId: string) {
       app.developerEmail,
       (app as any).privacyPolicy || null,
       appType,
+      app.icon,                          // Store icon URL from Google Play CDN
+      JSON.stringify(app.screenshots),   // Store screenshot URLs as JSON array
     ]
   );
-
-  // 7. Insert screenshots
-  for (let i = 0; i < app.screenshots.length; i++) {
-    await db.query(
-      `INSERT INTO screenshots (app_id, file_name)
-       VALUES ($1, $2)`,
-      [appId, `s${i + 1}.jpg`]
-    );
-  }
 
   console.log(`Inserted [${appType}]: ${app.title}`);
 }
