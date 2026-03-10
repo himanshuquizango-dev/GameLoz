@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import games from "../../assets/games.png";
+
 
 interface SidebarProps {
   isOpen: boolean;
@@ -7,6 +9,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
+  const [isGamesOpen, setIsGamesOpen] = useState(true);
+
   const categories = [
     { name: "Action", route: "/gameCategory/Action" },
     { name: "Adventure", route: "/gameCategory/Adventure" },
@@ -40,15 +44,12 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-        fixed top-0 left-0 h-full w-64 bg-[#1b1b1b] text-white z-40
+        fixed top-0 left-0 h-full w-96 bg-[#1b1b1b] text-white z-40
         transform transition-transform duration-300 flex flex-col
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-lg font-bold">Games</h2>
-
+        <div className="text-end p-4">
           <button onClick={toggleSidebar}>
             <svg
               className="w-6 h-6"
@@ -65,29 +66,51 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
             </svg>
           </button>
         </div>
-
-        {/* Categories */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2" style={{  scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {categories.map((category, idx) => (
-            <Link
-              key={idx}
-              to={category.route}
-              onClick={toggleSidebar}
-              className="block px-3 py-2 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition"
+        
+        {/* Games Accordion Group */}
+        <div className="border-b border-gray-700 flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between pt-0 p-4">
+            <h2 className="text-lg font-bold">Games</h2>
+            <button
+              onClick={() => setIsGamesOpen(!isGamesOpen)}
+              className="text-xl font-medium w-6 h-6 flex items-center justify-center -mr-1"
             >
-              {category.name}
-            </Link>
-          ))}
-        </nav>
+              {isGamesOpen ? "−" : "+"}
+            </button>
+          </div>
+
+          {/* Categories */}
+          <nav
+            className={`overflow-y-auto px-4 pb-4 space-y-2 flex-1 transition-all duration-300 ${isGamesOpen ? 'block' : 'hidden'}`}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {categories.map((category, idx) => (
+              <Link
+                key={idx}
+                to={category.route}
+                onClick={toggleSidebar}
+                className="block px-3 py-2 rounded text-[#9ca3af] hover:bg-gray-700 hover:text-white transition"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         {/* Bottom Button */}
         <div className="p-4 border-t border-gray-700">
-          <Link 
+          <Link
             to="/h5online"
             onClick={toggleSidebar}
             className="w-full flex items-center justify-center gap-2 bg-yellow-400 text-black font-bold py-3 rounded-full hover:bg-yellow-500 transition"
           >
-            🎮 Online Games
+                        <img
+              src={games}
+              alt="Online Games"
+              className="h-5"
+            />
+             Online Games
           </Link>
         </div>
       </aside>

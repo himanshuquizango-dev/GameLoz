@@ -16,15 +16,22 @@ export default function Category() {
   const [games, setGames] = useState<Game[]>([]);
   const [hotGames, setHotGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const limit = 12;
 
   useEffect(() => {
-    async function fetchCategoryGames() {
+    async function fetchInitialData() {
       setLoading(true);
+      setOffset(0);
+      setHasMore(true);
       try {
-        const res = await fetch(`/api/games/category/${encodeURIComponent(categoryName)}`);
+        const res = await fetch(`/api/games/category/${encodeURIComponent(categoryName)}?limit=${limit}&offset=0`);
         if (res.ok) {
           const data = await res.json();
           setGames(data);
+          if (data.length < limit) setHasMore(false);
         }
 
         // Fetch hot games (top-rated from any category) for the sidebar
@@ -34,14 +41,33 @@ export default function Category() {
           setHotGames(hotData.slice(0, 6));
         }
       } catch (err) {
-        console.error("Failed to fetch category games:", err);
+        console.error("Failed to fetch initial category games:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchCategoryGames();
+    fetchInitialData();
   }, [categoryName]);
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const newOffset = offset + limit;
+    try {
+      const res = await fetch(`/api/games/category/${encodeURIComponent(categoryName)}?limit=${limit}&offset=${newOffset}`);
+      if (res.ok) {
+        const data = await res.json();
+        setGames((prev) => [...prev, ...data]);
+        setOffset(newOffset);
+        if (data.length < limit) setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Failed to load more games:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -59,14 +85,7 @@ export default function Category() {
         <div className="flex-1">
           {/* Ad Placeholder */}
           <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
-            <span className="absolute top-2 right-2 text-xs text-blue-400">ⓘ</span>
-            <p className="text-gray-500 text-sm mb-3">Government of India</p>
-            <h2 className="text-3xl md:text-5xl font-bold font-serif mb-4 leading-tight text-gray-800">
-              <span className="bg-blue-100/50 px-2 rounded">PMJAY Scheme</span> <span className="text-gray-500 font-normal">NHA Is Leading the<br/>Implementation for Ayushman Bharat<br/>Digital Mission</span>
-            </h2>
-            <button className="bg-black text-white px-8 py-3 rounded-full mt-2 flex items-center gap-2 hover:bg-gray-800 transition">
-              Open <span className="text-xl">→</span>
-            </button>
+
           </div>
           <p className="text-[#a3a3a3] text-xs mb-8">Advertisement</p>
 
@@ -75,27 +94,47 @@ export default function Category() {
 
           {/* Games Grid */}
           {games.length > 0 ? (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-4 gap-y-8 mb-12">
-              {games.map((game, idx) => (
-                <Link to={`/app/${game.app_id}`} key={idx} className="flex flex-col cursor-pointer group">
-                  <div className="aspect-square rounded-2xl bg-gray-100 flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform duration-200 overflow-hidden">
-                    <img 
-                      src={`/apps/${game.app_id}/${game.icon_file}`} 
-                      alt={game.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                        (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="text-5xl">🎮</div>`;
-                      }}
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{game.name}</h3>
-                  <div className="flex items-center text-xs text-gray-500 mt-1">
-                    <span className="text-yellow-400 mr-1">⭐</span> {game.rating ? parseFloat(String(game.rating)).toFixed(1) : "N/A"}
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-4 gap-y-8 mb-8">
+                {games.map((game, idx) => (
+                  <Link to={`/app/${game.app_id}`} key={idx} className="flex flex-col cursor-pointer group">
+                    <div className="aspect-square rounded-2xl bg-gray-100 flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform duration-200 overflow-hidden">
+                      <img 
+                        src={`/apps/${game.app_id}/${game.icon_file}`} 
+                        alt={game.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="text-5xl">🎮</div>`;
+                        }}
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{game.name}</h3>
+                    <div className="flex items-center text-xs text-gray-500 mt-1">
+                      <span className="text-yellow-400 mr-1">⭐</span> {game.rating ? parseFloat(String(game.rating)).toFixed(1) : "N/A"}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="flex justify-center mb-12">
+                  <button 
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="bg-[#f27435] text-white px-12 py-3 rounded-full font-bold shadow-md hover:bg-[#d9662e] transition disabled:opacity-50 min-w-[200px]"
+                  >
+                    {loadingMore ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Loading...
+                      </div>
+                    ) : "Load More"}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <p className="text-gray-500 text-center py-12">No games found in this category.</p>
           )}

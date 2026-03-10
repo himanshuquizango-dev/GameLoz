@@ -92,9 +92,16 @@ export default function Featured() {
 
   return (
     <section className="bg-white py-12">
+      
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 w-full flex-grow">
+        <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+
+          </div>
         {renderSection("Featued Games", data.trendingGames)}
         {renderSection("Latest Games", data.trendingApps)}
+                  <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+
+          </div>  
         {renderSection("Latest Games", data.editorsChoiceGames)}
         {renderSection("Hot Games", data.editorsChoiceApps)}
       </div>

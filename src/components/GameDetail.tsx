@@ -25,6 +25,7 @@ interface GameData {
   content_rating: string;
   developer_email: string;
   privacy_policy: string;
+  howtoplay?: string;
   screenshots: string[];
 }
 
@@ -40,8 +41,10 @@ export default function GameDetail() {
   const { appId } = useParams<{ appId: string }>();
   const [game, setGame] = useState<GameData | null>(null);
   const [relatedGames, setRelatedGames] = useState<RelatedGame[]>([]);
+  const [appStoreLink, setAppStoreLink] = useState<string>("https://www.apple.com/app-store/");
   const [loading, setLoading] = useState(true);
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [showFullHowTo, setShowFullHowTo] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +52,7 @@ export default function GameDetail() {
     async function fetchGame() {
       setLoading(true);
       setShowFullDesc(false);
+      setShowFullHowTo(false);
       setCurrentSlide(0);
       try {
         const res = await fetch(`/api/game/${appId}`);
@@ -56,6 +60,17 @@ export default function GameDetail() {
           const data = await res.json();
           setGame(data.game);
           setRelatedGames(data.relatedGames || []);
+          
+          // Fetch App Store link
+          try {
+            const asRes = await fetch(`/api/appstore-search?term=${encodeURIComponent(data.game.name)}&dev=${encodeURIComponent(data.game.developer || "")}`);
+            if (asRes.ok) {
+              const asData = await asRes.json();
+              if (asData.url) setAppStoreLink(asData.url);
+            }
+          } catch (e) {
+            console.error("Failed to fetch app store link", e);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch game:", err);
@@ -101,6 +116,10 @@ export default function GameDetail() {
   // Truncate description
   const descLines = game.description || "";
   const shortDesc = descLines.length > 600 ? descLines.slice(0, 600) + "..." : descLines;
+
+  // Truncate how to play
+  const howToLines = game.howtoplay || "";
+  const shortHowTo = howToLines.length > 600 ? howToLines.slice(0, 600) + "..." : howToLines;
 
   return (
     <div className="flex-grow bg-white">
@@ -161,6 +180,9 @@ export default function GameDetail() {
           )}
         </div>
 
+          <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
+
+          </div>
         {/* Platform Badge */}
         <p className="text-[#a3a3a3] text-xs mb-2">Advertisement</p>
         <div className="mb-6">
@@ -199,18 +221,32 @@ export default function GameDetail() {
         <div className="mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Get The Games</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a href="#" className="flex items-center justify-center gap-2 bg-gray-400 text-white py-3.5 rounded-lg font-medium transition text-md">
-              <FontAwesomeIcon icon={faApple} /> Get it from App Store
-            </a>
-            <a
-              href={`https://play.google.com/store/apps/details?id=${game.app_id}`}
+            <a 
+              href={appStoreLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 bg-[#00875f] text-white py-3.5 rounded-lg font-medium hover:bg-[#00a171] transition text-md"
+              className="flex items-center justify-center gap-2 bg-[#1d1d1f] text-white py-3.5 rounded-lg font-medium hover:bg-black transition text-md"
             >
-              <FontAwesomeIcon icon={faGooglePlay} />
-              Get it from Google Play
+              <FontAwesomeIcon icon={faApple} /> Get it from App Store
             </a>
+            {(() => {
+              const regionalAppIdMap: Record<string, string> = {
+                "com.tencent.ig": "com.pubg.imobile", // PUBG -> BGMI
+              };
+              const playStoreId = regionalAppIdMap[game.app_id] || game.app_id;
+              
+              return (
+                <a
+                  href={`https://play.google.com/store/apps/details?id=${playStoreId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 bg-[#00875f] text-white py-3.5 rounded-lg font-medium hover:bg-[#00a171] transition text-md"
+                >
+                  <FontAwesomeIcon icon={faGooglePlay} />
+                  Get it from Google Play
+                </a>
+              );
+            })()}
           </div>
           <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
             <span className="text-green-500"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -221,9 +257,12 @@ export default function GameDetail() {
           </div>
           <p className="text-[12px] text-gray-400 mt-1">All link sources on this site are jumped to App Store, Google Play and other official platforms. No virus, no malware.</p>
         </div>
+          <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
 
+          </div>
         {/* Screenshots Carousel */}
         {game.screenshots && game.screenshots.length > 0 && (
+          
           <div className="mb-8">
             <p className="text-[#a3a3a3] text-xs mb-2">Advertisement</p>
             <div className="relative">
@@ -235,12 +274,12 @@ export default function GameDetail() {
                 {game.screenshots.map((ss, idx) => (
                   <div
                     key={idx}
-                    className="flex-shrink-0 w-[300px] h-[180px] rounded-xl overflow-hidden snap-start shadow-md"
+                    className="flex-shrink-0 h-[240px] sm:h-[320px] rounded-xl overflow-hidden snap-start shadow-md bg-gray-100"
                   >
                     <img
                       src={`/apps/${game.app_id}/${ss}`}
                       alt={`${game.name} screenshot ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      className="h-full w-auto object-cover block"
                     />
                   </div>
                 ))}
@@ -251,37 +290,44 @@ export default function GameDetail() {
                 <>
                   <button
                     onClick={() => scrollCarousel(-1)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center text-gray-700 hover:bg-white transition"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-xl shadow-md flex items-center justify-center text-gray-700 hover:bg-white transition"
                   >
                     ◀
                   </button>
                   <button
                     onClick={() => scrollCarousel(1)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center text-gray-700 hover:bg-white transition"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-xl shadow-md flex items-center justify-center text-gray-700 hover:bg-white transition"
                   >
                     ▶
                   </button>
                 </>
               )}
             </div>
-
-            {/* Grid toggle icons */}
-            <div className="flex items-center justify-center gap-4 mt-4 text-gray-400">
-              <button className="text-lg hover:text-gray-700">☰</button>
-              <button className="text-lg hover:text-gray-700">⊞</button>
-              <button className="text-lg hover:text-gray-700">⊡</button>
-            </div>
           </div>
         )}
 
         {/* How to Play */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">How to play</h2>
-          <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-            {game.description?.slice(0, 400) || "Enjoy this exciting game on your Android device!"}
+        {game.howtoplay && (
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">How to play</h2>
+            <div className="text-[#333] text-[18px] leading-[1.65] space-y-4 lg:pr-4">
+              {(showFullHowTo ? howToLines : shortHowTo).split('\n').filter(p => p.trim() !== '').map((para, idx) => (
+                <p key={idx}>{para.trim()}</p>
+              ))}
+            </div>
+            {howToLines.length > 600 && (
+              <button
+                onClick={() => setShowFullHowTo(!showFullHowTo)}
+                className="text-[#f27435] font-semibold text-sm mt-5 hover:underline"
+              >
+                {showFullHowTo ? "Read Less" : "Read More"}
+              </button>
+            )}
           </div>
-        </div>
+        )}
+          <div className="border border-gray-200 rounded p-6 mb-2 flex flex-col items-center justify-center text-center relative h-[250px]">
 
+          </div>
         {/* You May Also Like */}
         {relatedGames.length > 0 && (
           <div className="mb-8">

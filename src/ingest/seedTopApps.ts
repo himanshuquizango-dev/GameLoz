@@ -60,7 +60,7 @@ async function fetchAndIngest(category: string, label: string) {
           console.error(`    FAIL: ${app.appId} - ${err.message}`);
         }
       }
-      await delay(300); // 3 seconds between each app
+      await delay(100); // 3 seconds between each app
     }
   } catch (err: any) {
     console.error(`  Could not fetch ${category}: ${err.message}`);
